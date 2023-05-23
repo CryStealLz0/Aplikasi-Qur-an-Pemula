@@ -1,6 +1,7 @@
 import axios from "axios";
 import React, { useEffect } from "react";
 import "./App.css";
+
 interface IEnId {
   id?: string;
   en?: string;
@@ -39,20 +40,33 @@ interface IQuranVersesText {
 function App() {
   const baseUrl = "https://api.quran.gading.dev/surah";
 
+  // state
+  // state simplenya variable, di sini di pecah menjadi variable dan assigment
+  // contoh surahNumber sebagai statenya (variable)
+  // setSurahNumber sebagai mutation/action (assigment)
+
+  // contoh sederhana lagi
+  // let a = 1
+  // a adalah variable (state)
+  // = adalah mutation / actionnya, atau meng assign variable a dengan value 1
+  // bisa saja di jadikan function seperti ini agar dapat lebih mirip
+  // let a;
+  // function isia(isi: number) {
+  //   return a=isi;
+  // }
   const [quranResult, setQuranResult] = React.useState<IQuranBaseData | null>(
     null
   );
-
   const [surahNumber, setSurahNumber] = React.useState<number>(1);
-
-  // state loading
   const [loading, setLoading] = React.useState<boolean>(false);
 
-  // getting data from api
+  // fungsi yang di gunakan untk mengambil data dari api
   const fetchSurah = async (surahNumber: number) => {
     setLoading(true);
 
     try {
+      // kita dapat mengambil data menggunakan libray axios (untuk menghungkan fe dengan be via api)
+      // ref: https://axios-http.com/docs/intro
       const { status, data: fetchResult } = await axios.get<IBaseApiResult>(
         `${baseUrl}/${surahNumber}`
       );
@@ -69,12 +83,21 @@ function App() {
     }
   };
 
+  // fungsi yang diguankan untuk melakuan operasi aritmatik saat button di tekan
+  // simplenya sama seperti pengunaan DOM (document object model)
   const handleAddSurahNumber = (text: "next" | "prev") => {
     if (text === "next") {
       setSurahNumber(surahNumber + 1);
     } else setSurahNumber(surahNumber - 1);
   };
 
+  // useEffect digunakan untuk mengawasi perubahan yang terjadi pada variable
+  // useEffect ini di jalankan di saat suatu component terpanggil.
+  // ref:
+  // https://legacy.reactjs.org/docs/hooks-effect.html
+  // https://www.w3schools.com/react/react_useeffect.asp
+
+  // di sini yang di awasi perubahan valuenya adalah state(variabel) surahNumber.
   useEffect(() => {
     fetchSurah(surahNumber);
   }, [surahNumber]);
@@ -92,6 +115,8 @@ function App() {
   }, [quranResult]);
 
   return (
+    // PS: dalam react kita menggunakan ternary sebagai perandaian "?" if, ":" else
+    // PS2: dalam suatu function react kita hanya dapat mengembalikan satu value sama seperti menggunakan fuction
     <div className="bg-white w-[1400px] min-w-full">
       <div>
         {/* sedang loading data dari api (mengambil data dari backend via GET method REST API) */}
@@ -130,6 +155,7 @@ function App() {
                   <button
                     disabled={surahNumber === 1}
                     onClick={() => {
+                      // DOM, ketika di klik panggil fungsi
                       handleAddSurahNumber("prev");
                     }}
                   >
