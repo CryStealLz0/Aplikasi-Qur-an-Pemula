@@ -7,6 +7,11 @@ interface IEnId {
   en?: string;
 }
 
+interface ILongShort {
+  long?: string;
+  short?: string;
+}
+
 interface IBaseApiResult {
   code: number;
   data: IQuranBaseData;
@@ -18,23 +23,28 @@ interface IQuranBaseData {
   name: IQuranNameObj;
   number: number;
   numberOfVerses: number;
+  tafsir: IEnId;
+  // tafsir: IQuranTafsir;
   verses: IQuranVerses[];
 }
 
-interface IQuranNameObj {
-  long: string;
-  short: string;
+interface IQuranNameObj extends ILongShort {
   translation: IEnId;
   transliteration: IEnId;
 }
 
 interface IQuranVerses {
   text: IQuranVersesText;
+  tafsir: IQuranTafsir;
 }
 
 interface IQuranVersesText {
   arab: string;
   transliteration: IEnId;
+}
+
+interface IQuranTafsir {
+  id: ILongShort;
 }
 
 function App() {
@@ -71,6 +81,8 @@ function App() {
         `${baseUrl}/${surahNumber}`
       );
 
+      console.log("fetchResult", fetchResult);
+
       if (status < 400) {
         if (fetchResult.code === 200) {
           setQuranResult(fetchResult.data);
@@ -105,8 +117,8 @@ function App() {
   useEffect(() => {
     // console.log(quranResult.data);
     if (quranResult) {
-      console.log("data ada");
-      console.log(quranResult);
+      // console.log("data ada");
+      // console.log(quranResult);
       // console.log(quranResult.name);
       // console.log(quranResult.number);
       // console.log(quranResult.numberOfVerses);
@@ -129,6 +141,27 @@ function App() {
             {/* loading sudah selesai data di temukan */}
             {!loading && !!quranResult ? (
               <div className="text-black ">
+                <div className="flex flex-row  justify-between text-white mt-16">
+                  <button
+                    className="bg-green-600 border-1 border-stone-800 w-32"
+                    disabled={surahNumber === 1}
+                    onClick={() => {
+                      // DOM, ketika di klik panggil fungsi
+                      handleAddSurahNumber("prev");
+                    }}
+                  >
+                    Mundur
+                  </button>
+                  <button
+                    className="bg-green-600 border-1 border-stone-800 w-32"
+                    disabled={surahNumber === 114}
+                    onClick={() => {
+                      handleAddSurahNumber("next");
+                    }}
+                  >
+                    Maju
+                  </button>
+                </div>
                 <div className=" flex flex-col mb-10">
                   <span>{quranResult.name.long || "long name not found!"}</span>
                   <span>
@@ -145,18 +178,24 @@ function App() {
                     quranResult.verses.map((verse, index) => (
                       <div className="grid grid-cols-1 w-[70vw] m-auto">
                         {/* <div className="text-end p-8 ">{`${index + 1}, ${ */}
-                        <div className="p-8 grid-rows-1">
-                          <span className="text-start block">
-                            <div className="inline-block border border-stone-950 h-8 w-8 text-center rounded-full border-2 font-bold m-3">
-                              {index + 1}
-                            </div>
-                          </span>
-                          <div className="text-end block font-bold ">
+                        <div className="p-8 grid grid-cols-3">
+                          <div className="inline-block border-stone-950 h-8 w-8 text-center rounded-full border-2 font-bold m-3">
+                            {index + 1}
+                          </div>
+                          <div className="text-end font-bold col-span-2 ">
                             {verse.text.arab}
                           </div>
                         </div>
                         <div className="text-start border-b-2 pt-10 font-serif font-thin italic">
                           {`${verse.text.transliteration.en}`}
+                        </div>
+                        <div className="grid grid-cols-6 border-b-2 border-stone-950  p-5">
+                          <span className="block font-bold text-start">
+                            Tafsir :
+                          </span>
+                          <span className="col-span-5 text-justify">
+                            {`${verse.tafsir.id.short || "Kaga bener codenya"}`}
+                          </span>
                         </div>
                       </div>
                     ))
